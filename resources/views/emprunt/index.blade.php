@@ -191,7 +191,7 @@
                         </div>
 
                         <!-- Emprunter Action -->
-                        <form action="#" method="POST" class="relative z-10 mt-auto">
+                        <form action="{{ route('ballons.emprunter', $ballon->id_ballon) }}" method="POST" class="relative z-10 mt-auto">
                             @csrf
                             <button type="submit"
                                 class="w-full py-3 rounded-xl btn-outline flex items-center justify-center gap-2 text-white font-medium hover:border-accent-400/50 hover:bg-accent-400/10 transition-all cursor-pointer">

@@ -17,6 +17,8 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('id_ballon')->nullable()->constrained('ballons', 'id_ballon')->onDelete('cascade');
             $table->foreignId('id_chaussure')->nullable()->constrained('chaussures', 'id_chaussure')->onDelete('cascade');
+            $table->dateTime('date_retour')->nullable();
+            $table->string('statut')->default('En cours');
             $table->timestamps();
         });
     }

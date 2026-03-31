@@ -13,7 +13,7 @@ class CompteController extends Controller
     {
         $user = \Illuminate\Support\Facades\Auth::user();
         
-        $empruntsActifs = $user->emprunts()->with(['ballon', 'chaussure'])->where('date_expiration', '>', now())->get();
+        $empruntsActifs = $user->emprunts()->with(['ballon', 'chaussure'])->whereNull('date_retour')->get();
         $historique = \App\Models\Historique::with(['emprunt.ballon', 'emprunt.chaussure'])->latest('date_action')->take(10)->get();
         $stats = $user->sessionStats()->with('terrain')->latest('date_session')->take(5)->get();
         $reservations = $user->reservations()->with('terrain')->where('date_debut', '>', now())->orderBy('date_debut', 'asc')->get();

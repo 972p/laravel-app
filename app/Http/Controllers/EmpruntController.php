@@ -10,7 +10,9 @@ class EmpruntController extends Controller
 {
     public function index()
     {
-        $emprunts = Emprunt::with(['ballon', 'chaussure', 'user'])->get();
+        $emprunts = Emprunt::with(['ballon', 'chaussure', 'user'])
+            ->whereNull('date_retour')
+            ->get();
         return view('retour.index', compact('emprunts'));
     }
 
@@ -24,7 +26,8 @@ class EmpruntController extends Controller
         }
 
         $emprunt->update([
-            'date_expiration' => now()
+            'date_retour' => now(),
+            'statut' => 'Rendu',
         ]);
 
         \App\Models\Historique::create([

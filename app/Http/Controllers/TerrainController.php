@@ -24,6 +24,28 @@ class TerrainController extends Controller
         $dateDebut = \Carbon\Carbon::parse($validated['date_debut']);
         $dateFin = $dateDebut->copy()->addHours((int) $validated['duree_heures']);
 
+        // Check for overlaps
+        $overlap = \App\Models\Reservation::where('id_terrain', $terrain->id_terrain)
+            ->where(function ($query) use ($dateDebut, $dateFin) {
+                $query->where(function ($q) use ($dateDebut, $dateFin) {
+                    $q->where('date_debut', '>=', $dateDebut)
+                      ->where('date_debut', '<', $dateFin);
+                })
+                ->orWhere(function ($q) use ($dateDebut, $dateFin) {
+                    $q->where('date_fin', '>', $dateDebut)
+                      ->where('date_fin', '<=', $dateFin);
+                })
+                ->orWhere(function ($q) use ($dateDebut, $dateFin) {
+                    $q->where('date_debut', '<=', $dateDebut)
+                      ->where('date_fin', '>=', $dateFin);
+                });
+            })
+            ->exists();
+
+        if ($overlap) {
+            return back()->withErrors(['date_debut' => 'Ce créneau est déjà réservé pour ce terrain.'])->withInput();
+        }
+
         \App\Models\Reservation::create([
             'user_id' => auth()->id(),
             'id_terrain' => $terrain->id_terrain,

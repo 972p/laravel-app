@@ -11,7 +11,7 @@ class Emprunt extends Model
 
     protected $primaryKey = 'id_emprunt';
 
-    protected $fillable = ['date_debut', 'date_expiration', 'user_id', 'id_ballon', 'id_chaussure'];
+    protected $fillable = ['date_debut', 'date_expiration', 'user_id', 'id_ballon', 'id_chaussure', 'date_retour', 'statut'];
 
     public function user()
     {

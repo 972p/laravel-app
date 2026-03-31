@@ -17,16 +17,18 @@ class AdminUserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $request->validate([
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
             'is_admin' => 'required|boolean',
         ]);
         
         // Prevent removing own admin rights easily
-        if ($user->id === auth()->id() && !$request->is_admin) {
+        if ($user->id === auth()->id() && !$validated['is_admin']) {
             return back()->withErrors('Vous ne pouvez pas retirer vos propres droits administrateur.');
         }
 
-        $user->update(['is_admin' => $request->is_admin]);
+        $user->update($validated);
         return redirect()->route('admin.users.index')->with('success', 'Utilisateur mis à jour.');
     }
 

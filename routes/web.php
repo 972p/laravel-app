@@ -30,6 +30,7 @@ use App\Http\Controllers\StatistiqueController;
 
 // Protected Routes
 Route::middleware('auth')->group(function () {
+    Route::post('/ballons/{id}/emprunter', [BallonController::class, 'emprunter'])->name('ballons.emprunter');
     Route::get('/retours', [EmpruntController::class, 'index']);
     Route::get('/reservations', [ReservationController::class, 'index']);
     Route::get('/compte', [CompteController::class, 'index'])->name('compte.index');
