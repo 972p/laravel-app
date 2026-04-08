@@ -2,75 +2,61 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StoreReservationRequest;
-use App\Models\ShoeReservation;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use App\Models\Emprunt; // On reste sur Emprunt pour les chaussures
+use App\Models\Reservation; // Pour les terrains
 use Illuminate\Support\Facades\Auth;
 
 class ReservationController extends Controller
 {
+    /**
+     * Affiche le planning (Réservations Chaussures + Terrains)
+     */
     public function index()
     {
-        $user = Auth::user();
-        
-        // Fetch shoe reservations
-        $shoeReservations = ShoeReservation::where('user_id', $user->id)
-            ->with('shoe')
-            ->orderBy('start_date', 'desc')
+        $user = auth()->user();
+
+        // 1. On récupère les emprunts de MATÉRIEL (Chaussures)
+        // On utilise 'with' pour charger la relation chaussure et éviter le crash
+        $emprunts = Emprunt::where('user_id', $user->id)
+            ->with('chaussure')
             ->get();
-            
-        // Fetch terrain reservations (original functionality)
-        $terrainReservations = \App\Models\Reservation::where('user_id', $user->id)
+
+        // 2. On récupère les réservations de TERRAINS
+        $reservations = Reservation::where('user_id', $user->id)
             ->with('terrain')
-            ->orderBy('date_debut', 'desc')
             ->get();
-            
-        return view('chaussures.reservations', compact('shoeReservations', 'terrainReservations'));
-    }
 
+        // On envoie les DEUX variables à la vue
+        return view('planning.index', compact('emprunts', 'reservations'));
+    }
     /**
-     * Store a new shoe reservation.
-     * 
-     * @param StoreReservationRequest $request
-     * @return JsonResponse
+     * Annuler une réservation (Chaussure ou Terrain)
      */
-    public function store(StoreReservationRequest $request): JsonResponse
-    {
-        $reservation = ShoeReservation::create([
-            'shoe_id'    => $request->shoe_id,
-            'user_id'    => Auth::id(), 
-            'start_date' => $request->start_date,
-            'end_date'   => $request->end_date,
-        ]);
-
-        return response()->json([
-            'message'     => 'Réservation créée avec succès !',
-            'reservation' => $reservation,
-        ], 201);
-    }
-
     public function destroy($id)
     {
-        // Try finding in ShoeReservations first
-        $shoeRes = ShoeReservation::find($id);
+        $user = Auth::user();
+
+        // On tente de trouver l'ID dans les chaussures d'abord
+        $shoeRes = Emprunt::find($id);
         if ($shoeRes) {
-            if ($shoeRes->user_id !== Auth::id() && !Auth::user()->is_admin) {
+            if ($shoeRes->user_id !== $user->id && !$user->is_admin) {
                 abort(403);
             }
             $shoeRes->delete();
-            return back()->with('success', 'Réservation de chaussures annulée.');
+            return redirect()->route('planning.index')->with('success', 'Réservation de chaussures annulée.');
         }
 
-        // Try finding in terrain Reservations (original model)
-        $terrainRes = \App\Models\Reservation::find($id);
+        // Sinon, on cherche dans les terrains
+        $terrainRes = Reservation::find($id);
         if ($terrainRes) {
-            if ($terrainRes->user_id !== Auth::id() && !Auth::user()->is_admin) {
+            if ($terrainRes->user_id !== $user->id && !$user->is_admin) {
                 abort(403);
             }
             $terrainRes->delete();
             return back()->with('success', 'Réservation de terrain annulée.');
         }
 
-        abort(404, 'Réservation non trouvée.');
+        return back()->withErrors('Réservation non trouvée.');
     }
 }

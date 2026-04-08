@@ -61,7 +61,7 @@
                     <a href="/ballons" class="text-slate-400 text-sm font-medium hover:text-white transition-colors">Ballons</a>
                     <a href="/chaussures" class="text-slate-400 text-sm font-medium hover:text-white transition-colors">Chaussures</a>
                     <a href="/terrains" class="text-slate-400 text-sm font-medium hover:text-white transition-colors">Terrains</a>
-                    <a href="/reservations" class="text-white text-sm font-medium relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-accent-500">Planning</a>
+                    <a href="/planning" class="text-white text-sm font-medium relative after:content-[''] after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-accent-500">Planning</a>
                     @if(auth()->check() && auth()->user()->is_admin)
                         <a href="/admin" class="text-white hover:text-accent-400 text-sm font-medium transition-colors">Administration</a>
                     @endif

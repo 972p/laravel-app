@@ -12,8 +12,9 @@ class Tag extends Model
 
     protected $fillable = ['name'];
 
-    public function shoes(): BelongsToMany
+    public function chaussures(): BelongsToMany
     {
-        return $this->belongsToMany(Shoe::class);
+        // On précise bien 'Chaussure::class' et le nom de la table pivot 'shoe_tag'
+        return $this->belongsToMany(Chaussure::class, 'shoe_tag', 'tag_id', 'shoe_id');
     }
 }

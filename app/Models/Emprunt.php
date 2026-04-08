@@ -11,7 +11,24 @@ class Emprunt extends Model
 
     protected $primaryKey = 'id_emprunt';
 
-    protected $fillable = ['date_debut', 'date_expiration', 'user_id', 'id_ballon', 'id_chaussure', 'date_retour', 'statut'];
+    protected $fillable = [
+        'date_debut',
+        'date_expiration',
+        'user_id',
+        'id_ballon',
+        'id_chaussure',
+        'date_retour',
+        'statut'
+    ];
+
+    /**
+     * Correction : On indique à Laravel de transformer ces colonnes en objets Carbon (Dates)
+     */
+    protected $casts = [
+        'date_debut' => 'datetime',
+        'date_expiration' => 'datetime',
+        'date_retour' => 'datetime',
+    ];
 
     public function user()
     {
@@ -20,6 +37,7 @@ class Emprunt extends Model
 
     public function chaussure()
     {
+        // On précise bien les clés étrangères car tu n'utilises pas le standard 'chaussure_id'
         return $this->belongsTo(Chaussure::class, 'id_chaussure', 'id_chaussure');
     }
 

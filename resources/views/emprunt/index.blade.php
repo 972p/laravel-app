@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>H3 Sports | Équipements</title>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" type="text/css" href="https://npmcdn.com/flatpickr/dist/themes/dark.css">
+
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -106,6 +109,9 @@
             border-color: rgba(255, 255, 255, 0.4);
             transform: translateY(-2px);
         }
+
+        .flatpickr-input { background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; border-radius: 0.75rem !important; padding: 0.6rem 1rem !important; width: 100%; font-size: 0.75rem; transition: all 0.3s; }
+        .flatpickr-input:hover { border-color: rgba(249, 115, 22, 0.5) !important; }
     </style>
 </head>
 
@@ -154,14 +160,37 @@
     <!-- Main Content -->
     <main class="flex-grow pt-32 pb-20 px-6 lg:px-12 relative z-10 border-t-0">
         <div class="max-w-7xl mx-auto">
-            <header class="mb-16 text-center md:text-left">
+            <header class="mb-12 text-center md:text-left">
                 <h1 class="text-4xl lg:text-5xl font-serif font-bold text-white mb-4">Équipements <span
                         class="text-gradient">Premium</span></h1>
                 <p class="text-slate-400 font-light text-lg max-w-2xl mx-auto md:mx-0">Parcourez notre collection de ballons professionnels et empruntez ceux qui correspondent à votre style de jeu.</p>
             </header>
 
+            @if(session('success'))
+                <div class="mb-8 p-4 bg-green-500/20 border border-green-500/50 rounded-xl text-green-400 text-sm">{{ session('success') }}</div>
+            @endif
+            @if($errors->any())
+                <div class="mb-8 p-4 bg-red-500/20 border border-red-500/50 rounded-xl text-red-400 text-sm">{{ $errors->first() }}</div>
+            @endif
+
+            <form action="{{ route('ballons.index') }}" method="GET" class="mb-12 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white/5 p-6 rounded-2xl border border-white/10 max-w-2xl mx-auto md:mx-0">
+                <div class="flex flex-col gap-2">
+                    <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Disponibilité</label>
+                    <input type="text" id="global-datepicker" placeholder="Rechercher des dates libres..." class="bg-dark-800 border-white/10 rounded-xl text-white text-xs p-2.5 outline-none focus:border-accent-500 flatpickr-input" value="{{ request('start_date') ? request('start_date').' au '.request('end_date') : '' }}">
+                    <input type="hidden" name="start_date" id="global_start" value="{{ request('start_date') }}">
+                    <input type="hidden" name="end_date" id="global_end" value="{{ request('end_date') }}">
+                </div>
+
+                <div class="flex items-end">
+                    <button type="submit" class="w-full py-2.5 bg-accent-500 hover:bg-accent-600 text-white rounded-xl font-bold text-xs transition-all shadow-lg shadow-accent-500/20">Filtrer</button>
+                    @if(request('start_date'))
+                        <a href="{{ route('ballons.index') }}" class="ml-4 px-4 py-2.5 border border-white/10 text-white text-xs rounded-xl hover:bg-white/10 transition-colors">Vider</a>
+                    @endif
+                </div>
+            </form>
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                @foreach ($ballons as $ballon)
+                @forelse ($ballons as $ballon)
                     <div
                         class="glass-card rounded-[1.5rem] p-6 group relative overflow-hidden flex flex-col justify-between h-full bg-dark-800/80">
                         <div
@@ -191,19 +220,30 @@
                         </div>
 
                         <!-- Emprunter Action -->
-                        <form action="{{ route('ballons.emprunter', $ballon->id_ballon) }}" method="POST" class="relative z-10 mt-auto">
+                        <form action="{{ route('ballons.emprunter', $ballon->id_ballon) }}" method="POST" class="relative z-10 mt-auto space-y-3">
                             @csrf
+                            <input type="text" class="datepicker flatpickr-input" placeholder="Choisir vos dates" 
+                                   data-booked="{{ $ballon->getBookedDates()->toJson() }}" required>
+                            
+                            <input type="hidden" name="start_date" class="start_val">
+                            <input type="hidden" name="end_date" class="end_val">
+
                             <button type="submit"
-                                class="w-full py-3 rounded-xl btn-outline flex items-center justify-center gap-2 text-white font-medium hover:border-accent-400/50 hover:bg-accent-400/10 transition-all cursor-pointer">
-                                <svg class="w-5 h-5 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="w-full py-3 rounded-xl btn-outline flex items-center justify-center gap-2 text-white font-medium hover:border-accent-400/50 hover:bg-accent-400/10 transition-all cursor-pointer text-xs">
+                                <svg class="w-4 h-4 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 4v16m8-8H4"></path>
                                 </svg>
-                                Emprunter
+                                Réserver
                             </button>
                         </form>
                     </div>
-                @endforeach
+                @empty
+                    <div class="col-span-full text-center py-20 bg-white/5 rounded-3xl border border-white/5">
+                        <p class="text-slate-500">Aucun ballon disponible pour cette période.</p>
+                        <a href="{{ route('ballons.index') }}" class="text-accent-400 text-sm mt-2 inline-block">Voir tous les ballons</a>
+                    </div>
+                @endforelse
             </div>
         </div>
     </main>
@@ -216,5 +256,53 @@
             <div class="text-slate-500 text-xs tracking-wider uppercase">&copy; 2026 H3 Campus</div>
         </div>
     </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialisation calendrier pour chaque ballon
+            document.querySelectorAll('.datepicker').forEach(function(el) {
+                const bookedDates = JSON.parse(el.dataset.booked || '[]');
+                
+                const disableConfig = bookedDates.map(range => ({
+                    from: range.from,
+                    to: range.to
+                }));
+
+                flatpickr(el, {
+                    mode: "range",
+                    minDate: "today",
+                    dateFormat: "Y-m-d",
+                    locale: "fr",
+                    disable: disableConfig,
+                    onClose: function(selectedDates, dateStr, instance) {
+                        if (selectedDates.length === 2) {
+                            const form = instance.element.closest('form');
+                            form.querySelector('.start_val').value = selectedDates[0].toISOString().split('T')[0];
+                            form.querySelector('.end_val').value = selectedDates[1].toISOString().split('T')[0];
+                        }
+                    }
+                });
+            });
+
+            // Initialisation calendrier global de recherche
+            flatpickr('#global-datepicker', {
+                mode: "range",
+                minDate: "today",
+                dateFormat: "Y-m-d",
+                locale: "fr",
+                onClose: function(selectedDates, dateStr, instance) {
+                    if (selectedDates.length === 2) {
+                        document.getElementById('global_start').value = selectedDates[0].toISOString().split('T')[0];
+                        document.getElementById('global_end').value = selectedDates[1].toISOString().split('T')[0];
+                    } else {
+                        document.getElementById('global_start').value = '';
+                        document.getElementById('global_end').value = '';
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>

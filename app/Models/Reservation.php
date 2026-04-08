@@ -2,22 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Reservation extends Model
 {
-    use HasFactory;
+    // Indiquez la table si elle ne suit pas le pluriel automatique
+    protected $table = 'reservations';
+    // AUTORISER l'enregistrement de ces colonnes
+    protected $fillable = [
+        'user_id',
+        'id_terrain',
+        'date_debut',
+        'date_fin',
+        'statut'
+    ];
 
-    protected $primaryKey = 'id_reservation';
-
-    protected $fillable = ['date_debut', 'date_fin', 'user_id', 'id_terrain', 'statut'];
+    protected $casts = [
+        'date_debut' => 'datetime',
+        'date_fin' => 'datetime',
+    ];
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
+    // Relation avec le terrain
     public function terrain()
     {
         return $this->belongsTo(Terrain::class, 'id_terrain', 'id_terrain');
