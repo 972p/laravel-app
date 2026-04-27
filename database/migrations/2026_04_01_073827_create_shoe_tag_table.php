@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('shoe_tag', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('shoe_id')->constrained()->onDelete('cascade');
-            $table->foreignId('tag_id')->constrained()->onDelete('cascade');
+            // Référence correcte vers chaussures.id_chaussure
+            $table->foreignId('shoe_id')->constrained('chaussures', 'id_chaussure')->onDelete('cascade');
+            $table->foreignId('tag_id')->constrained('tags')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 

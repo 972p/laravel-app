@@ -1,0 +1,20 @@
+# docker-compose.yml
+services:
+  mysql-laravel:
+    image: mysql:9.6.0
+    ports:
+      - 3306:3306
+    environment:
+      # - MYSQL_ROOT_PASSWORD=bibliotek-root-password-laravel-2026
+      - MYSQL_RANDOM_ROOT_PASSWORD=yes
+      # On créer un compte utilisateur non root pour Laravel
+      - MYSQL_USER=h3sports
+      - MYSQL_PASSWORD=favelasleboss123
+      # On crée une base de données dédiée
+      - MYSQL_DATABASE=h3sport
+  phpmyadmin-laravel:
+    image: phpmyadmin:5.2.3-apache
+    ports:
+      - 8080:80
+    environment:
+      - PMA_ARBITRARY=1
