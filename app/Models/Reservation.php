@@ -8,6 +8,7 @@ class Reservation extends Model
 {
     // Indiquez la table si elle ne suit pas le pluriel automatique
     protected $table = 'reservations';
+    protected $primaryKey = 'id_reservation';
     // AUTORISER l'enregistrement de ces colonnes
     protected $fillable = [
         'user_id',

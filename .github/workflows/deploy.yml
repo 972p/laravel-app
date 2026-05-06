@@ -1,0 +1,23 @@
+name: Deploy to Amazon EC2
+
+# On déclenche l'action à chaque push sur la branche 'main' (ou 'master')
+on:
+  push:
+    branches:
+      - main 
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Connexion SSH et Déploiement
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          # On exécute le script qu'on a préparé à l'étape 1
+          script: |
+            cd /var/www/H3Complexe/laravel-app
+            ./deploy.sh
