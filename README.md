@@ -1,3 +1,5 @@
+http://52.47.89.223/
+
 # 🏀 BasketManager — Application de gestion d'équipements & terrains
 
 > Application web développée avec **Laravel 12** permettant la gestion complète d'une salle de basket : emprunts d'équipements, réservations de terrains, suivi de statistiques de tir, et administration centralisée.
